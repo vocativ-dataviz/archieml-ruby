@@ -110,8 +110,8 @@ module Archieml
 
       if scope_key == ''
         last_stack_item = @stack.pop
-        scope = (last_stack_item ? last_stack_item[:scope] : @data) or @data
-        @stack_scope = @stack[@stack.length - 1]
+        @scope = (last_stack_item ? last_stack_item[:scope] : @data) || @data
+        @stack_scope = @stack.last
 
       elsif %w([ {).include?(scope_type)
         nesting = false
@@ -135,7 +135,7 @@ module Archieml
             if (scope_type == '[')
               last_bit = 'value'
             elsif (scope_type == '{')
-              @scope = @scope[:value] = {}
+              @scope = key_scope[:value] ||= {}
             end
         end
 
@@ -154,16 +154,16 @@ module Archieml
           else
             @stack = [stack_scope_item]
           end
-          @stack_scope = @stack.last
+          @stack_scope = @stack[@stack.length - 1]
 
         elsif scope_type == '{'
           if nesting
             @stack << stack_scope_item
           else
-            @scope = key_scope[last_bit] = (key_scope[last_bit].class == 'Hash') ? key_scope[last_bit] : {}
+            @scope = key_scope[last_bit] = last_bit.is_a?(Hash) ? last_bit : {}
             @stack = [stack_scope_item]
           end
-          @stack_scope = @stack[@stack.length - 1]
+          @stack_scope = @scope[@stack.length - 1]
         end
       end
     end
