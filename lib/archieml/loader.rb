@@ -126,7 +126,7 @@ module Archieml
 
         key_bits  = scope_key.split('.')
         key_bits[0...-1].each do |bit|
-          key_scope = key_scope[bit] ||= {}
+          key_scope = @scope[bit] ||= {}
         end
         last_bit = key_bits.last
 
@@ -154,7 +154,7 @@ module Archieml
           else
             @stack = [stack_scope_item]
           end
-          @stack_scope = @stack[@stack.length - 1]
+          @stack_scope = key_scope[@stack.length - 1]
 
         elsif scope_type == '{'
           if nesting
@@ -163,7 +163,7 @@ module Archieml
             @scope = key_scope[last_bit] = last_bit.is_a?(Hash) ? last_bit : {}
             @stack = [stack_scope_item]
           end
-          @stack_scope = @scope[@stack.length - 1]
+          @stack_scope = key_scope[@stack.length - 1]
         end
       end
     end
@@ -172,7 +172,7 @@ module Archieml
       if (@stack_scope and @stack_scope[:flags].include?('+') and text.match(/[^\n\r\s]/))
         @stack_scope[:array].push({
           "type": "text",
-          "value": text.gsub!(/(^\s*)|(\s*$)/, '')
+          "value": text.gsub(/(^\s*)|(\s*$)/, '')
         })
       else
         @buffer_string += text
