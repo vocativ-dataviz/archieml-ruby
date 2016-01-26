@@ -46,11 +46,10 @@ module Archieml
           self.parse_text(match[0])
 
         else
-          @buffer_string += line
+          line = ''
         end
       end
 
-      self.flush_buffer!
       return @data
     end
 
@@ -126,7 +125,7 @@ module Archieml
 
         key_bits  = scope_key.split('.')
         key_bits[0...-1].each do |bit|
-          key_scope = @scope[bit] ||= {}
+          key_scope = key_scope[bit] ||= {}
         end
         last_bit = key_bits.last
 
@@ -154,7 +153,7 @@ module Archieml
           else
             @stack = [stack_scope_item]
           end
-          @stack_scope = key_scope[@stack.length - 1]
+          @stack_scope = @stack[@stack.length - 1]
 
         elsif scope_type == '{'
           if nesting
@@ -169,10 +168,10 @@ module Archieml
     end
 
     def parse_text(text)
-      if (@stack_scope and @stack_scope[:flags].include?('+') and text.match(/[^\n\r\s]/))
+      if (@stack_scope and @stack_scope[:flags].include?('+') and /[^\n\r\s]/.match(text))
         @stack_scope[:array].push({
           "type": "text",
-          "value": text.gsub(/(^\s*)|(\s*$)/, '')
+          "value": text.gsub!(/(^\s*)|(\s*\Z$)/, '')
         })
       else
         @buffer_string += text
