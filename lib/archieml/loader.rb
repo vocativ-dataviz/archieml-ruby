@@ -135,7 +135,7 @@ module Archieml
             if (scope_type == '[')
               last_bit = 'value'
             elsif (scope_type == '{')
-              @scope = @scope['value'] = {}
+              @scope = @scope[:value] = {}
             end
         end
 
@@ -194,7 +194,7 @@ module Archieml
           @stack_scope[:array] << (@scope = {})
         end
         if @stack_scope[:flags].include?('+')
-          @scope['type'] = key
+          @scope[:type] = key
         else
           @stack_scope[:array_first_key] = @stack_scope[:array_first_key] || key
         end
